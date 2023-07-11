@@ -28,6 +28,9 @@ devDependencies:
   postcss:
     specifier: ^8.4.25
     version: 8.4.25
+  prettier:
+    specifier: 3.0.0
+    version: 3.0.0
   tailwindcss:
     specifier: ^3.3.2
     version: 3.3.2
@@ -1105,6 +1108,12 @@ packages:
       nanoid: 3.3.6
       picocolors: 1.0.0
       source-map-js: 1.0.2
+    dev: true
+
+  /prettier@3.0.0:
+    resolution: {integrity: sha512-zBf5eHpwHOGPC47h0zrPyNn+eAEIdEzfywMoYn2XPi0P44Zp0tSq64rq0xAREh4auw2cJZHo9QUob+NqCQky4g==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: true
 
   /queue-microtask@1.2.3:
