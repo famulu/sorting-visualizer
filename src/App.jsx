@@ -1,60 +1,112 @@
 import { useState } from "react";
 
 export default function App() {
-  const arr = [];
-  for (let i = 0; i < 10; i++) {
-    arr.push(Math.ceil(Math.random() * 100));
+  const [list, setList] = useState(generateArray);
+  const [loopIndices, setLoopIndices] = useState({
+    i: 0,
+    j: 0,
+    maxJ: list.length - 1,
+  });
+  const [toSwap, setToSwap] = useState(false);
+  const [swapped, setSwapped] = useState(false);
+  const [completed, setCompleted] = useState(0);
+  const [clicked, setClicked] = useState(false);
+
+  if (clicked && completed !== 2) {
+    setTimeout(handleClick, 200);
   }
 
-  const [list, setList] = useState(arr);
+  function handleClick() {
+    setClicked(true);
 
-  function sort() {
-    function merge(left, right) {
-      let sortedArr = []; // the sorted items will go here
-      while (left.length && right.length) {
-        // Insert the smallest item into sortedArr
-        if (left[0] < right[0]) {
-          sortedArr.push(left.shift());
-        } else {
-          sortedArr.push(right.shift());
-        }
-      }
-      // Use spread operators to create a new array, combining the three arrays
-      return [...sortedArr, ...left, ...right];
+    if (completed > 0) {
+      setCompleted(2);
+      setClicked(false)
+      return;
     }
 
-    function mergeSort(arr) {
-      // Base case
-      if (arr.length <= 1) return arr;
-      let mid = Math.floor(arr.length / 2);
-      // Recursive calls
-      let left = mergeSort(arr.slice(0, mid));
-      let right = mergeSort(arr.slice(mid));
-      return merge(left, right);
+    if (swapped) {
+      setSwapped(false);
+      return;
+    }
+    const copy = [...list];
+    const { j } = loopIndices;
+    if (toSwap) {
+      [copy[j], copy[j + 1]] = [copy[j + 1], copy[j]];
+      setList(copy);
+      setToSwap(false);
+      setSwapped(true);
+      return;
+    } else if (copy[j] > copy[j + 1]) {
+      setToSwap(true);
+      return;
     }
 
-    setList(mergeSort(list));
+    loopIndices.j += 1;
+    if (loopIndices.j >= loopIndices.maxJ) {
+      loopIndices.i += 1;
+      loopIndices.j = 0;
+      loopIndices.maxJ -= 1;
+    }
+
+    if (loopIndices.i === list.length - 1) {
+      setCompleted(1);
+    }
+
+    setLoopIndices({ ...loopIndices });
   }
+
+  const bgColor = toSwap || swapped ? "bg-red-300" : "bg-green-300";
+
+  const buttonBg = clicked
+    ? "bg-slate-200"
+    : "bg-gradient-to-r from-indigo-500 to-pink-500";
 
   return (
     <div className="px-4 pt-2">
       <div className="flex justify-center">
         <button
-          onClick={sort}
-          className="bg-gradient-to-r from-indigo-500 to-pink-500 text-slate-50 p-2 rounded-lg drop-shadow-lg transition ease-in-out duration-500 hover:scale-110"
+          onClick={handleClick}
+          className={`${buttonBg} text-slate-50 p-2 rounded-lg drop-shadow-lg transition ease-in-out duration-500 hover:scale-110`}
         >
           Sort
         </button>
       </div>
       <div className="flex flex-row h-screen gap-2">
-        {list.map((num, i) => (
-          <div
-            key={i}
-            style={{ height: `${num}%` }}
-            className="bg-slate-800 w-4"
-          ></div>
-        ))}
+        {list.map((num, i) => {
+          let bg = "bg-slate-800";
+          if ([loopIndices.j, loopIndices.j + 1].includes(i)) {
+            bg = bgColor;
+          }
+          if (i > loopIndices.maxJ) {
+            bg = "bg-purple-300";
+          }
+
+          if (completed === 1) {
+            bg = "bg-green-300";
+          }
+
+          if (completed === 2) {
+            bg = "bg-purple-300";
+          }
+
+          return (
+            <div
+              key={i}
+              style={{ height: `${num}%` }}
+              className={`w-4 ${bg}`}
+            ></div>
+          );
+        })}
       </div>
     </div>
   );
+}
+
+function generateArray() {
+  const arr = [];
+  for (let i = 0; i < 5; i++) {
+    arr.push(Math.ceil(Math.random() * 100));
+  }
+  return arr;
 }
