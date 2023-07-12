@@ -13,7 +13,7 @@ export default function App() {
   const [clicked, setClicked] = useState(false);
 
   if (clicked && completed !== 2) {
-    setTimeout(handleClick, 200);
+    setTimeout(handleClick, 50);
   }
 
   function handleClick() {
@@ -21,7 +21,7 @@ export default function App() {
 
     if (completed > 0) {
       setCompleted(2);
-      setClicked(false)
+      setClicked(false);
       return;
     }
 
@@ -94,7 +94,7 @@ export default function App() {
             <div
               key={i}
               style={{ height: `${num}%` }}
-              className={`w-4 ${bg}`}
+              className={`w-4 ${bg} flex-shrink-0`}
             ></div>
           );
         })}
@@ -105,7 +105,7 @@ export default function App() {
 
 function generateArray() {
   const arr = [];
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 25; i++) {
     arr.push(Math.ceil(Math.random() * 100));
   }
   return arr;
