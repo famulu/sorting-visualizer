@@ -67,6 +67,7 @@ export default function App() {
       <div className="flex justify-center">
         <button
           onClick={handleClick}
+          type="button"
           className={`${buttonBg} text-slate-50 p-2 rounded-lg drop-shadow-lg transition ease-in-out duration-500 hover:scale-110`}
         >
           Sort
@@ -95,7 +96,7 @@ export default function App() {
               key={i}
               style={{ height: `${num}%` }}
               className={`w-4 ${bg} flex-shrink-0`}
-            ></div>
+            />
           );
         })}
       </div>
