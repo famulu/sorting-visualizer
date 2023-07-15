@@ -35,8 +35,10 @@ export default function App() {
   };
   const [mergeState, setMergeState] = useState(initialMergeState);
 
+  const {completed} = mergeState
+
   if (inProgress) {
-    const delay = Math.max(0, Math.floor(2400 / list.length));
+    const delay = completed ? 500 : Math.max(0, Math.floor(2400 / list.length));
     setTimeout(sort, delay);
   }
 
@@ -130,6 +132,7 @@ export default function App() {
           setMergeState((m) => ({
             ...m,
             completed: true,
+            a: list.length
           }));
         }
       }
@@ -217,6 +220,7 @@ export default function App() {
             const size = +e.target.value;
             setList(generateArray(size));
             setBubbleState((b) => ({ ...b, maxIndex: size - 1 }));
+            setMergeState(m => ({...m, a: 0}))
           }}
         />
         {sortingAlgorithms.map((algo) => (
@@ -255,9 +259,11 @@ export default function App() {
               bg = "bg-green-300";
             }
           } else {
-            const { swappers, completed, a, b } = mergeState;
+            const { swappers, completed, a, b, width } = mergeState;
             if (completed) {
               bg = "bg-green-300";
+            } else if (width * 2 >= list.length && i < a) {
+              bg = "bg-purple-300"
             } else if (inProgress) {
               if (swappers.indices.length > 0) {
                 if (swappers.indices.includes(i)) {
