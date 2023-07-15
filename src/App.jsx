@@ -237,7 +237,7 @@ export default function App() {
             <span>{algo}</span>
           </label>
         ))}
-        {checked === "" || <SortButton inProgress={false} onClick={sort} />}
+        {checked === "" || <SortButton inProgress={inProgress} onClick={sort} />}
       </div>
 
       <div className="flex gap-0.5 flex-grow justify-center">
