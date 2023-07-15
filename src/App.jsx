@@ -35,7 +35,7 @@ export default function App() {
   };
   const [mergeState, setMergeState] = useState(initialMergeState);
 
-  const {completed} = mergeState
+  const { completed } = mergeState;
 
   if (inProgress) {
     const delay = completed ? 500 : Math.max(0, Math.floor(2400 / list.length));
@@ -132,7 +132,7 @@ export default function App() {
           setMergeState((m) => ({
             ...m,
             completed: true,
-            a: list.length
+            a: list.length,
           }));
         }
       }
@@ -220,7 +220,7 @@ export default function App() {
             const size = +e.target.value;
             setList(generateArray(size));
             setBubbleState((b) => ({ ...b, maxIndex: size - 1 }));
-            setMergeState(m => ({...m, a: 0}))
+            setMergeState((m) => ({ ...m, a: 0 }));
           }}
         />
         {sortingAlgorithms.map((algo) => (
@@ -237,7 +237,9 @@ export default function App() {
             <span>{algo}</span>
           </label>
         ))}
-        {checked === "" || <SortButton inProgress={inProgress} onClick={sort} />}
+        {checked === "" || (
+          <SortButton inProgress={inProgress} onClick={sort} />
+        )}
       </div>
 
       <div className="flex gap-0.5 flex-grow justify-center">
@@ -263,7 +265,7 @@ export default function App() {
             if (completed) {
               bg = "bg-green-300";
             } else if (width * 2 >= list.length && i < a) {
-              bg = "bg-purple-300"
+              bg = "bg-purple-300";
             } else if (inProgress) {
               if (swappers.indices.length > 0) {
                 if (swappers.indices.includes(i)) {
