@@ -1,6 +1,9 @@
 import { useState } from "react";
+import generateArray from "./generateArray.js";
+import SortButton from "./SortButton.jsx";
 
-export default function BubbleSort({ inProgress, finished, list, setList }) {
+export default function BubbleSort() {
+  const [list, setList] = useState(() => generateArray(4));
   const [index, setIndex] = useState(0);
   // Exclusive upper bound of index. Any index above maxIndex is undefined or already sorted
   const [maxIndex, setMaxIndex] = useState(list.length - 1);
@@ -11,13 +14,12 @@ export default function BubbleSort({ inProgress, finished, list, setList }) {
     swapped: false,
   });
   const [completed, setCompleted] = useState(false);
+  const [inProgress, setInProgress] = useState(false);
 
-  if (inProgress) {
-    const delay = completed
-      ? 500
-      : Math.max(0, Math.floor(2400 / list.length - 30));
-    setTimeout(handleClick, delay);
-  }
+  // if (inProgress) {
+  //   const delay = completed ? 500 : Math.max(0, Math.floor(2400 / list.length - 30));
+  //   setTimeout(handleClick, delay);
+  // }
 
   function updateIndex() {
     const nextIndex = index + 1;
@@ -38,6 +40,7 @@ export default function BubbleSort({ inProgress, finished, list, setList }) {
 
   function handleClick() {
     if (!inProgress) {
+      setInProgress(true);
       setIndex(0);
       setMaxIndex(list.length - 1);
       setSwapCount(0);
@@ -45,7 +48,7 @@ export default function BubbleSort({ inProgress, finished, list, setList }) {
     }
 
     if (completed) {
-      finished();
+      setInProgress(false);
       setCompleted(false);
       return;
     }
@@ -77,6 +80,21 @@ export default function BubbleSort({ inProgress, finished, list, setList }) {
 
   return (
     <div className="p-4 pb-16 h-screen flex flex-col bg-slate-300">
+      <div className="flex justify-center gap-x-5 mb-4">
+        <input
+          type="range"
+          disabled={inProgress}
+          min="2"
+          max="200"
+          value={list.length}
+          onChange={(e) => {
+            const size = +e.target.value;
+            setList(generateArray(size));
+            setMaxIndex(size - 1);
+          }}
+        />
+        <SortButton onClick={handleClick} inProgress={false} />
+      </div>
       <div className="flex gap-0.5 flex-grow justify-center">
         {list.map((num, i) => {
           let bg = "bg-slate-800";
@@ -98,7 +116,7 @@ export default function BubbleSort({ inProgress, finished, list, setList }) {
             <div
               key={i}
               style={{ height: `${num}%` }}
-              className={`w-8 ${bg}`}
+              className={`w-4 ${bg}`}
             />
           );
         })}
