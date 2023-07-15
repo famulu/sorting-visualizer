@@ -5,7 +5,11 @@ import SortButton from "./SortButton.jsx";
 export default function App() {
   const [list, setList] = useState(generateArray(6));
   const [inProgress, setInProgress] = useState(false);
-  const sortingAlgorithms = ["Merge Sort", "Bubble Sort", "Selection Sort"];
+  const sortingAlgorithms = {
+    "Merge Sort": mergeSort,
+    "Bubble Sort": bubbleSort,
+    "Selection Sort": selectionSort,
+  };
   const [checked, setChecked] = useState("");
   const [completed, setCompleted] = useState(false);
   const [sorted, setSorted] = useState(false);
@@ -48,17 +52,7 @@ export default function App() {
 
   if (inProgress) {
     const delay = completed ? 500 : Math.max(0, Math.floor(2400 / list.length));
-    setTimeout(sort, delay);
-  }
-
-  function sort() {
-    if (checked === "Merge Sort") {
-      mergeSort();
-    } else if (checked === "Bubble Sort") {
-      bubbleSort();
-    } else {
-      selectionSort();
-    }
+    setTimeout(sortingAlgorithms[checked], delay);
   }
 
   function selectionSort() {
@@ -313,7 +307,7 @@ export default function App() {
             setSorted(false);
           }}
         />
-        {sortingAlgorithms.map((algo) => (
+        {Object.keys(sortingAlgorithms).map((algo) => (
           <label className="flex items-center gap-0.5" key={algo}>
             <input
               type="radio"
@@ -328,7 +322,10 @@ export default function App() {
           </label>
         ))}
         {checked === "" || (
-          <SortButton inProgress={inProgress} onClick={sort} />
+          <SortButton
+            inProgress={inProgress}
+            onClick={sortingAlgorithms[checked]}
+          />
         )}
       </div>
 
