@@ -5,8 +5,10 @@ import SortButton from "./SortButton.jsx";
 export default function App() {
   const [list, setList] = useState(generateArray(6));
   const [inProgress, setInProgress] = useState(false);
-  const sortingAlgorithms = ["Merge Sort", "Bubble Sort"];
+  const sortingAlgorithms = ["Merge Sort", "Bubble Sort", "Selection Sort"];
   const [checked, setChecked] = useState("");
+  const [completed, setCompleted] = useState(false);
+  const [sorted, setSorted] = useState(false);
 
   const initialBubbleState = {
     index: 0,
@@ -16,7 +18,6 @@ export default function App() {
       indices: [],
       swapped: false,
     },
-    completed: false,
   };
   const [bubbleState, setBubbleState] = useState(initialBubbleState);
 
@@ -31,11 +32,19 @@ export default function App() {
       indices: [],
       swapped: false,
     },
-    completed: false,
   };
   const [mergeState, setMergeState] = useState(initialMergeState);
 
-  const { completed } = mergeState;
+  const initialSelectionState = {
+    a: 0,
+    bMin: 0,
+    b: 1,
+    swappers: {
+      indices: [],
+      swapped: false,
+    },
+  };
+  const [selectionState, setSelectionState] = useState(initialSelectionState);
 
   if (inProgress) {
     const delay = completed ? 500 : Math.max(0, Math.floor(2400 / list.length));
@@ -45,21 +54,100 @@ export default function App() {
   function sort() {
     if (checked === "Merge Sort") {
       mergeSort();
-    } else {
+    } else if (checked === "Bubble Sort") {
       bubbleSort();
+    } else {
+      selectionSort();
     }
   }
 
-  function mergeSort() {
-    const { width, left, right, end, a, b, swappers, completed } = mergeState;
+  function selectionSort() {
     if (!inProgress) {
       setInProgress(true);
-      setMergeState(initialMergeState);
+      setSorted(false);
       return;
     }
 
     if (completed) {
-      setMergeState((m) => ({ ...m, completed: false }));
+      setSorted(true);
+      setCompleted(false);
+      setInProgress(false);
+      setSelectionState(initialSelectionState);
+      return;
+    }
+    const { a, bMin, b, swappers } = selectionState;
+
+    if (swappers.swapped) {
+      updateA();
+      return;
+    }
+
+    const temp = [...list];
+    if (swappers.indices.length > 0) {
+      [temp[bMin], temp[a]] = [temp[a], temp[bMin]];
+      setList(temp);
+      setSelectionState((s) => ({
+        ...s,
+        swappers: { ...swappers, swapped: true },
+      }));
+      return;
+    }
+
+    if (b >= list.length) {
+      if (bMin === a) {
+        updateA();
+      } else {
+        setSelectionState((s) => ({
+          ...s,
+          swappers: {
+            indices: [bMin, a],
+            swapped: false,
+          },
+        }));
+      }
+      return;
+    }
+
+    let newBMin = bMin;
+    if (list[b] < list[bMin]) {
+      newBMin = b;
+      setSelectionState((s) => ({ ...s, bMin: newBMin }));
+    }
+    const newB = b + 1;
+    setSelectionState((s) => ({ ...s, b: newB }));
+
+    function updateA() {
+      const newA = a + 1;
+      const newB = newA + 1;
+      setSelectionState((s) => ({
+        ...s,
+        a: newA,
+        b: newB,
+        bMin: newA,
+        swappers: {
+          indices: [],
+          swapped: false,
+        },
+      }));
+      if (newA >= list.length - 1) {
+        setSelectionState((s) => ({ ...s, a: list.length }));
+        setCompleted(true);
+      }
+    }
+  }
+
+  function mergeSort() {
+    const { width, left, right, end, a, b, swappers } = mergeState;
+    if (!inProgress) {
+      setInProgress(true);
+      setSorted(false);
+      return;
+    }
+
+    if (completed) {
+      setSorted(true);
+      setMergeState(initialMergeState);
+      setCompleted(false);
       setInProgress(false);
       return;
     }
@@ -129,9 +217,9 @@ export default function App() {
             b: newRight,
           }));
         } else {
+          setCompleted(true);
           setMergeState((m) => ({
             ...m,
-            completed: true,
             a: list.length,
           }));
         }
@@ -140,14 +228,15 @@ export default function App() {
   }
 
   function bubbleSort() {
-    const { index, maxIndex, swapCount, swappers, completed } = bubbleState;
+    const { index, maxIndex, swapCount, swappers } = bubbleState;
 
     function updateIndex() {
       const nextIndex = index + 1;
       if (nextIndex >= maxIndex) {
         const nextMaxIndex = maxIndex - 1;
         if (nextMaxIndex === 0 || swapCount === 0) {
-          setBubbleState((b) => ({ ...b, maxIndex: -1, completed: true }));
+          setBubbleState((b) => ({ ...b, maxIndex: -1 }));
+          setCompleted(true);
         } else {
           setBubbleState((b) => ({
             ...b,
@@ -163,13 +252,15 @@ export default function App() {
 
     if (!inProgress) {
       setInProgress(true);
-      setBubbleState(initialBubbleState);
+      setSorted(false);
       return;
     }
 
     if (completed) {
+      setSorted(true);
+      setBubbleState(initialBubbleState);
       setInProgress(false);
-      setBubbleState({ ...bubbleState, completed: false });
+      setCompleted(false);
       return;
     }
 
@@ -219,12 +310,11 @@ export default function App() {
           onChange={(e) => {
             const size = +e.target.value;
             setList(generateArray(size));
-            setBubbleState((b) => ({ ...b, maxIndex: size - 1 }));
-            setMergeState((m) => ({ ...m, a: 0 }));
+            setSorted(false);
           }}
         />
         {sortingAlgorithms.map((algo) => (
-          <label className="flex items-center gap-0.5">
+          <label className="flex items-center gap-0.5" key={algo}>
             <input
               type="radio"
               name="algorithm"
@@ -245,36 +335,56 @@ export default function App() {
       <div className="flex gap-0.5 flex-grow justify-center">
         {list.map((num, i) => {
           let bg = "bg-slate-800";
-          if (checked === "Bubble Sort") {
-            const { index, swappers, maxIndex, completed } = bubbleState;
-            if (inProgress && [index, index + 1].includes(i)) {
-              bg = "bg-green-300";
-            }
-            if (swappers.indices.includes(i)) {
-              bg = "bg-red-300";
-            }
-            if (i > maxIndex) {
-              bg = "bg-purple-300";
-            }
 
-            if (completed) {
-              bg = "bg-green-300";
-            }
-          } else {
-            const { swappers, completed, a, b, width } = mergeState;
-            if (completed) {
-              bg = "bg-green-300";
-            } else if (width * 2 >= list.length && i < a) {
-              bg = "bg-purple-300";
-            } else if (inProgress) {
-              if (swappers.indices.length > 0) {
-                if (swappers.indices.includes(i)) {
-                  bg = "bg-red-300";
-                }
-              } else if (i === a || i === b) {
+          if (inProgress) {
+            if (checked === "Bubble Sort") {
+              const { index, swappers, maxIndex } = bubbleState;
+              if ([index, index + 1].includes(i)) {
                 bg = "bg-green-300";
               }
+              if (swappers.indices.includes(i)) {
+                bg = "bg-red-300";
+              }
+              if (i > maxIndex) {
+                bg = "bg-purple-300";
+              }
+            } else if (checked === "Merge Sort") {
+              const { swappers, a, b, width } = mergeState;
+              if (i === a || i === b) {
+                bg = "bg-green-300";
+              }
+              if (swappers.indices.includes(i)) {
+                bg = "bg-red-300";
+              }
+              if (width * 2 >= list.length && i < a) {
+                bg = "bg-purple-300";
+              }
+            } else {
+              const { a, b, bMin, swappers } = selectionState;
+              if (i === a) {
+                bg = "bg-blue-300";
+              }
+              if (i === bMin) {
+                bg = "bg-yellow-300";
+              }
+              if (i === b) {
+                bg = "bg-green-300";
+              }
+              if (swappers.indices.includes(i)) {
+                bg = "bg-red-300";
+              }
+              if (i < a) {
+                bg = "bg-purple-300";
+              }
             }
+          }
+
+          if (sorted) {
+            bg = "bg-purple-300";
+          }
+
+          if (completed) {
+            bg = "bg-green-300";
           }
 
           return (
