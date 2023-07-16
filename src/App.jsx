@@ -247,12 +247,12 @@ export default function App() {
     if (!inProgress) {
       setInProgress(true);
       setSorted(false);
+      setBubbleState(initialBubbleState);
       return;
     }
 
     if (completed) {
       setSorted(true);
-      setBubbleState(initialBubbleState);
       setInProgress(false);
       setCompleted(false);
       return;
