@@ -59,6 +59,7 @@ export default function App() {
     if (!inProgress) {
       setInProgress(true);
       setSorted(false);
+      setSelectionState(initialSelectionState);
       return;
     }
 
@@ -66,7 +67,6 @@ export default function App() {
       setSorted(true);
       setCompleted(false);
       setInProgress(false);
-      setSelectionState(initialSelectionState);
       return;
     }
     const { a, bMin, b, swappers } = selectionState;
@@ -134,13 +134,13 @@ export default function App() {
     const { width, left, right, end, a, b, swappers } = mergeState;
     if (!inProgress) {
       setInProgress(true);
+      setMergeState(initialMergeState);
       setSorted(false);
       return;
     }
 
     if (completed) {
       setSorted(true);
-      setMergeState(initialMergeState);
       setCompleted(false);
       setInProgress(false);
       return;
