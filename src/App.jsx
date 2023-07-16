@@ -3,16 +3,23 @@ import generateArray from "./generateArray.js";
 import SortButton from "./SortButton.jsx";
 
 export default function App() {
-  const [list, setList] = useState(generateArray(6));
+  const [list, setList] = useState(generateArray(12));
   const [inProgress, setInProgress] = useState(false);
   const sortingAlgorithms = {
     "Merge Sort": mergeSort,
     "Bubble Sort": bubbleSort,
     "Selection Sort": selectionSort,
+    "Selection Sort 2": selectionSort2,
+    "Selection Sort 3": selectionSort3
   };
   const [checked, setChecked] = useState("");
   const [completed, setCompleted] = useState(false);
   const [sorted, setSorted] = useState(false);
+  const [count, setCount] = useState(0)
+  const [count2, setCount2] = useState(0)
+  const [count3, setCount3] = useState(0)
+
+  console.log(count, count2)
 
   const initialBubbleState = {
     index: 0,
@@ -55,7 +62,96 @@ export default function App() {
     setTimeout(sortingAlgorithms[checked], delay);
   }
 
+  function selectionSort3() {
+    if (!inProgress) {
+      setInProgress(true);
+      setSorted(false);
+      return;
+    }
+
+    if (completed) {
+      setSorted(true);
+      setCompleted(false);
+      setInProgress(false);
+      setSelectionState(initialSelectionState);
+      return;
+    }
+
+    const { a, bMin, b, swappers } = selectionState;
+
+    let newBMin = bMin
+    if (list[b] < list[bMin]) {
+      newBMin = b
+      setSelectionState(s => ({...s, bMin: newBMin}))
+    }
+
+    let newB = b + 1
+    setSelectionState(s => ({...s, b: newB}))
+    if (newB < list.length) {
+      return
+    }
+
+    if (newBMin !== a) {
+      const temp = [...list]
+      [temp[newBMin], temp[a]] = [temp[a], temp[newBMin]]
+      setSelectionState(temp)
+    }
+
+    let newA = a + 1
+    setSelectionState(s => ({...s, a: newA}))
+    if (newA < list.length - 1) {
+      let newBMin = newA
+
+    }
+  }
+
+  function selectionSort2() {
+    setCount2(count2 + 1)
+    if (!inProgress) {
+      setInProgress(true);
+      setSorted(false);
+      return;
+    }
+
+    if (completed) {
+      setSorted(true);
+      setCompleted(false);
+      setInProgress(false);
+      setSelectionState(initialSelectionState);
+      return;
+    }
+
+    const { a, bMin, b, swappers } = selectionState;
+
+    if (a >= list.length - 1) {
+      setSelectionState((s) => ({ ...s, a: list.length }));
+      setCompleted(true);
+      return
+    }
+
+    if (b >= list.length) {
+      const temp = [...list]
+      if (bMin !== a) {
+        [temp[bMin], temp[a]] = [temp[a], temp[bMin]]
+      }
+      setList(temp)
+      const newA = a + 1
+      const newBMin = newA
+      const newB = newA + 1
+      setSelectionState((s) => ({...s, a: newA, b: newB, bMin: newBMin}))
+      return;
+    }
+
+    if (list[b] >= list[bMin]) {
+      setSelectionState((s) => ({...s, b: b + 1}))
+      return
+    }
+
+    setSelectionState((s) => ({...s, b: b + 1, bMin: b}))
+  }
+
   function selectionSort() {
+    setCount(count + 1)
     if (!inProgress) {
       setInProgress(true);
       setSorted(false);
