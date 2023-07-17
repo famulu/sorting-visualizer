@@ -1,8 +1,4 @@
-import generateArray from "./generateArray.js";
-
 function quickSort(arr) {
-  let count = 0;
-  let swapCount = 0;
   const temp = [...arr];
   // Stack for storing start and end index
   const stack = [{ x: 0, y: temp.length - 1 }];
@@ -17,15 +13,12 @@ function quickSort(arr) {
     let a = x;
 
     for (let b = x; b < y; b++) {
-      count++;
       if (temp[b] <= pivot) {
-        swapCount++;
         [temp[a], temp[b]] = [temp[b], temp[a]];
         a++;
       }
     }
 
-    swapCount++;
     [temp[a], temp[y]] = [temp[y], temp[a]];
 
     stack.pop();
@@ -41,12 +34,10 @@ function quickSort(arr) {
     }
   }
 
-  return [temp, count, swapCount];
+  return temp;
 }
 
 function hoareQuickSort(arr) {
-  let count = 0;
-  let swapCount = 0;
   const temp = [...arr];
   // Stack for storing start and end index
   const stack = [{ x: 0, y: temp.length - 1 }];
@@ -64,18 +55,15 @@ function hoareQuickSort(arr) {
 
     while (true) {
       do {
-        count++;
         a++;
       } while (temp[a] < pivot);
       do {
-        count++;
         b--;
       } while (temp[b] > pivot);
 
       if (a >= b) {
         break;
       }
-      swapCount++;
       [temp[a], temp[b]] = [temp[b], temp[a]];
     }
 
@@ -91,37 +79,5 @@ function hoareQuickSort(arr) {
     }
   }
 
-  return [temp, count, swapCount];
+  return temp
 }
-
-function main() {
-  let qWin = 0;
-  let hWin = 0;
-  let hCount = 0;
-  let hSwapCount = 0;
-  let qCount = 0;
-  let qSwapCount = 0;
-  for (let j = 0; j < 40_000; j++) {
-    const a = generateArray(200);
-
-    const t0 = performance.now();
-    const [, h, hs] = hoareQuickSort(a);
-    hCount += h
-    hSwapCount += hs
-    const t1 = performance.now();
-    const [, q, qs] = quickSort(a);
-    qCount += q
-    qSwapCount += qs
-    const t2 = performance.now();
-    if (t2 - t1 < t1 - t0) {
-      qWin++;
-    } else {
-      hWin++;
-    }
-  }
-  console.log({ hCount, hSwapCount, qCount, qSwapCount });
-  console.log({h: hCount + 3 * hSwapCount, q: qCount + 3 * qSwapCount})
-  console.log({ length: 200, qWin, hWin });
-}
-
-main();
