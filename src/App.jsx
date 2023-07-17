@@ -3,34 +3,17 @@ import generateArray from "./generateArray.js";
 import SortButton from "./SortButton.jsx";
 
 export default function App() {
-  const [list, setList] = useState(generateArray(12));
+  const [list, setList] = useState(generateArray(6));
   const [inProgress, setInProgress] = useState(false);
   const sortingAlgorithms = {
     "Merge Sort": mergeSort,
     "Bubble Sort": bubbleSort,
     "Selection Sort": selectionSort,
-    "Selection Sort 2": selectionSort2,
-    "Selection Sort 3": selectionSort3
+    "Quick Sort": quickSort,
   };
   const [checked, setChecked] = useState("");
   const [completed, setCompleted] = useState(false);
   const [sorted, setSorted] = useState(false);
-  const [count, setCount] = useState(0)
-  const [count2, setCount2] = useState(0)
-  const [count3, setCount3] = useState(0)
-
-  console.log(count, count2)
-
-  const initialBubbleState = {
-    index: 0,
-    maxIndex: list.length - 1,
-    swapCount: 0,
-    swappers: {
-      indices: [],
-      swapped: false,
-    },
-  };
-  const [bubbleState, setBubbleState] = useState(initialBubbleState);
 
   const initialMergeState = {
     width: 1,
@@ -46,6 +29,17 @@ export default function App() {
   };
   const [mergeState, setMergeState] = useState(initialMergeState);
 
+  const initialBubbleState = {
+    index: 0,
+    maxIndex: list.length - 1,
+    swapCount: 0,
+    swappers: {
+      indices: [],
+      swapped: false,
+    },
+  };
+  const [bubbleState, setBubbleState] = useState(initialBubbleState);
+
   const initialSelectionState = {
     a: 0,
     bMin: 0,
@@ -57,15 +51,28 @@ export default function App() {
   };
   const [selectionState, setSelectionState] = useState(initialSelectionState);
 
+  const initialQuickState = {
+    stack: [{ x: 0, y: list.length - 1 }],
+    a: 0,
+    b: 0,
+    pivots: [],
+    swappers: {
+      indices: [],
+      swapped: false,
+    },
+  };
+  const [quickState, setQuickState] = useState(initialQuickState);
+
   if (inProgress) {
     const delay = completed ? 500 : Math.max(0, Math.floor(2400 / list.length));
     setTimeout(sortingAlgorithms[checked], delay);
   }
 
-  function selectionSort3() {
+  function quickSort() {
     if (!inProgress) {
       setInProgress(true);
       setSorted(false);
+      setQuickState(initialQuickState);
       return;
     }
 
@@ -73,85 +80,90 @@ export default function App() {
       setSorted(true);
       setCompleted(false);
       setInProgress(false);
-      setSelectionState(initialSelectionState);
       return;
     }
 
-    const { a, bMin, b, swappers } = selectionState;
+    const { stack, a, b, pivots, swappers } = quickState;
 
-    let newBMin = bMin
-    if (list[b] < list[bMin]) {
-      newBMin = b
-      setSelectionState(s => ({...s, bMin: newBMin}))
-    }
-
-    let newB = b + 1
-    setSelectionState(s => ({...s, b: newB}))
-    if (newB < list.length) {
-      return
-    }
-
-    if (newBMin !== a) {
-      const temp = [...list]
-      [temp[newBMin], temp[a]] = [temp[a], temp[newBMin]]
-      setSelectionState(temp)
-    }
-
-    let newA = a + 1
-    setSelectionState(s => ({...s, a: newA}))
-    if (newA < list.length - 1) {
-      let newBMin = newA
-
-    }
-  }
-
-  function selectionSort2() {
-    setCount2(count2 + 1)
-    if (!inProgress) {
-      setInProgress(true);
-      setSorted(false);
+    if (swappers.swapped) {
+      const newA = a + 1;
+      const newB = b + 1;
+      setQuickState((q) => ({
+        ...q,
+        a: newA,
+        b: newB,
+        swappers: {
+          indices: [],
+          swapped: false,
+        },
+      }));
       return;
     }
 
-    if (completed) {
-      setSorted(true);
-      setCompleted(false);
-      setInProgress(false);
-      setSelectionState(initialSelectionState);
+    if (swappers.indices.length > 0) {
+      const temp = [...list];
+      [temp[a], temp[b]] = [temp[b], temp[a]];
+      setList(temp);
+      setQuickState((q) => ({
+        ...q,
+        swappers: {
+          ...swappers,
+          swapped: true,
+        },
+      }));
       return;
     }
 
-    const { a, bMin, b, swappers } = selectionState;
-
-    if (a >= list.length - 1) {
-      setSelectionState((s) => ({ ...s, a: list.length }));
+    if (stack.length === 0) {
       setCompleted(true);
-      return
-    }
-
-    if (b >= list.length) {
-      const temp = [...list]
-      if (bMin !== a) {
-        [temp[bMin], temp[a]] = [temp[a], temp[bMin]]
-      }
-      setList(temp)
-      const newA = a + 1
-      const newBMin = newA
-      const newB = newA + 1
-      setSelectionState((s) => ({...s, a: newA, b: newB, bMin: newBMin}))
       return;
     }
 
-    if (list[b] >= list[bMin]) {
-      setSelectionState((s) => ({...s, b: b + 1}))
-      return
+    const { x, y } = stack[stack.length - 1];
+    const pivot = list[y];
+
+    if (b >= y) {
+      const temp = [...list];
+      [temp[a], temp[y]] = [temp[y], temp[a]];
+      setList(temp);
+      const newPivots = [...pivots];
+      newPivots.push(a);
+      const tempStack = [...stack];
+      tempStack.pop();
+      if (a + 1 < y) {
+        tempStack.push({ x: a + 1, y: y });
+      } else {
+        newPivots.push(a + 1);
+      }
+      if (a - 1 > x) {
+        tempStack.push({ x: x, y: a - 1 });
+      } else {
+        newPivots.push(a - 1);
+      }
+      setQuickState((q) => ({ ...q, stack: tempStack, pivots: newPivots }));
+      if (tempStack.length > 0) {
+        const newA = tempStack[tempStack.length - 1].x;
+        const newB = tempStack[tempStack.length - 1].x;
+        setQuickState((q) => ({ ...q, a: newA, b: newB }));
+      }
+      return;
     }
 
-    setSelectionState((s) => ({...s, b: b + 1, bMin: b}))
+    if (list[b] <= pivot) {
+      setQuickState((s) => ({
+        ...s,
+        swappers: {
+          indices: [a, b],
+          swapped: false,
+        },
+      }));
+      return;
+    }
+
+    setQuickState((q) => ({ ...q, b: b + 1 }));
   }
 
   function selectionSort() {
-    setCount(count + 1)
     if (!inProgress) {
       setInProgress(true);
       setSorted(false);
@@ -172,8 +184,8 @@ export default function App() {
       return;
     }
 
-    const temp = [...list];
     if (swappers.indices.length > 0) {
+      const temp = [...list];
       [temp[bMin], temp[a]] = [temp[a], temp[bMin]];
       setList(temp);
       setSelectionState((s) => ({
@@ -198,8 +210,8 @@ export default function App() {
       return;
     }
 
-    let newBMin = bMin;
     if (list[b] < list[bMin]) {
+      let newBMin = bMin;
       newBMin = b;
       setSelectionState((s) => ({ ...s, bMin: newBMin }));
     }
@@ -417,12 +429,10 @@ export default function App() {
             <span>{algo}</span>
           </label>
         ))}
-        {checked === "" || (
-          <SortButton
-            inProgress={inProgress}
-            onClick={sortingAlgorithms[checked]}
-          />
-        )}
+        <SortButton
+          disabled={checked === "" || inProgress}
+          onClick={sortingAlgorithms[checked]}
+        />
       </div>
 
       <div className="flex gap-0.5 flex-grow justify-center">
@@ -452,7 +462,7 @@ export default function App() {
               if (width * 2 >= list.length && i < a) {
                 bg = "bg-purple-300";
               }
-            } else {
+            } else if (checked === "Selection Sort") {
               const { a, b, bMin, swappers } = selectionState;
               if (i === a) {
                 bg = "bg-blue-300";
@@ -468,6 +478,26 @@ export default function App() {
               }
               if (i < a) {
                 bg = "bg-purple-300";
+              }
+            } else {
+              const { stack, a, b, pivots, swappers } = quickState;
+              if (stack.length) {
+                const { y } = stack[stack.length - 1];
+                if (i === y) {
+                  bg = "bg-yellow-300";
+                }
+              }
+              if (pivots.includes(i)) {
+                bg = "bg-purple-300";
+              }
+              if (i === a) {
+                bg = "bg-green-300";
+              }
+              if (i === b) {
+                bg = "bg-blue-300";
+              }
+              if (swappers.indices.includes(i)) {
+                bg = "bg-red-300";
               }
             }
           }
@@ -492,3 +522,47 @@ export default function App() {
     </div>
   );
 }
+
+// function selectionSort2() {
+//   if (!inProgress) {
+//     setInProgress(true);
+//     setSorted(false);
+//     setSelectionState(initialSelectionState);
+//     return;
+//   }
+//
+//   if (completed) {
+//     setSorted(true);
+//     setCompleted(false);
+//     setInProgress(false);
+//     return;
+//   }
+//
+//   const { a, bMin, b, swappers } = selectionState;
+//
+//   if (a >= list.length - 1) {
+//     setSelectionState((s) => ({ ...s, a: list.length }));
+//     setCompleted(true);
+//     return
+//   }
+//
+//   if (b >= list.length) {
+//     const temp = [...list]
+//     if (bMin !== a) {
+//       [temp[bMin], temp[a]] = [temp[a], temp[bMin]]
+//     }
+//     setList(temp)
+//     const newA = a + 1
+//     const newBMin = newA
+//     const newB = newA + 1
+//     setSelectionState((s) => ({...s, a: newA, b: newB, bMin: newBMin}))
+//     return;
+//   }
+//
+//   if (list[b] >= list[bMin]) {
+//     setSelectionState((s) => ({...s, b: b + 1}))
+//     return
+//   }
+//
+//   setSelectionState((s) => ({...s, b: b + 1, bMin: b}))
+// }
