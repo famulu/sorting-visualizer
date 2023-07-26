@@ -401,8 +401,8 @@ export default function App() {
   }
 
   return (
-    <div className="p-4 pb-16 h-screen flex flex-col bg-slate-300">
-      <div className="flex justify-center gap-x-5 mb-4">
+    <div className="flex h-screen min-w-[600px] flex-col bg-slate-300 p-4 pb-8">
+      <div className="mb-4 flex justify-center gap-x-5">
         <input
           type="range"
           min="2"
@@ -421,6 +421,7 @@ export default function App() {
               type="radio"
               name="algorithm"
               value={algo}
+              disabled={inProgress}
               checked={algo === checked}
               onChange={(e) => {
                 setChecked(e.target.value);
@@ -435,7 +436,7 @@ export default function App() {
         />
       </div>
 
-      <div className="flex gap-0.5 flex-grow justify-center">
+      <div className="flex flex-grow justify-center gap-[1px]">
         {list.map((num, i) => {
           let bg = "bg-slate-800";
 
@@ -514,7 +515,7 @@ export default function App() {
             <div
               key={i}
               style={{ height: `${num}%` }}
-              className={`w-8 ${bg}`}
+              className={`w-8 ${bg} min-w-[1px]`}
             />
           );
         })}
