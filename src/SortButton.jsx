@@ -8,7 +8,7 @@ export default function SortButton({ onClick, disabled }) {
       <button
         onClick={onClick}
         type="button"
-        className={`${buttonBg} text-slate-50 p-2 rounded-lg drop-shadow-lg transition ease-in-out duration-500 ${
+        className={`${buttonBg} rounded-lg p-2 text-slate-50 drop-shadow-lg transition duration-500 ease-in-out ${
           disabled || "hover:scale-110"
         }`}
         disabled={disabled}
