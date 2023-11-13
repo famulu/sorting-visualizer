@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
   bubbleSortGenerator,
   insertionSortGenerator,
@@ -16,7 +16,7 @@ const sorters = {
     generator: bubbleSortGenerator,
     colorFunction: bubbleSortColors,
   },
-  "Hoare Quick Sort": {
+  "Quick Sort (Hoare)": {
     generator: hoareQuickSortGenerator,
     colorFunction: hoareQuickSortColors,
   },
@@ -24,7 +24,7 @@ const sorters = {
     generator: insertionSortGenerator,
     colorFunction: insertionSortColors,
   },
-  "Quick Sort": {
+  "Quick Sort (Lomuto)": {
     generator: quickSortGenerator,
     colorFunction: quickSortColors,
   },
@@ -55,8 +55,13 @@ export default function App2() {
       setTimeout(stepSort, Math.floor(2400 / list.length));
     } else {
       setIsSorting(false);
-      setColors(Array(list.length).fill("bg-purple-300"));
+      flashGreen()
     }
+  }
+
+  function flashGreen() {
+    setColors(Array(list.length).fill("bg-green-300"))
+    setTimeout(() =>setColors(Array(list.length).fill("bg-purple-300")), 500)
   }
 
   function startSorting() {
@@ -166,10 +171,13 @@ function hoareQuickSortColors({ array, left, right, pivotIndex, state }) {
 
 function insertionSortColors({ array, i, j, state }) {
   const colors = Array(array.length).fill("bg-slate-800");
-  colors[i] = "bg-green-300";
+  colors[i] = "bg-yellow-300";
   if (state === "pre-swap" || state === "post-swap") {
     colors[j] = "bg-red-300";
     colors[j + 1] = "bg-red-300";
+  } else if (state === "pre-compare") {
+    colors[j] = "bg-green-300"
+    colors[j + 1] = "bg-green-300"
   }
   return colors;
 }
@@ -192,8 +200,13 @@ function selectionSortColors({ array, start, min, i, state }) {
   return colors;
 }
 
-function mergeSortColors({ array, left, right, state }) {
+function mergeSortColors({ array, left, right, start, end, state }) {
   const colors = Array(array.length).fill("bg-slate-800");
+  if (start === 0 && end === array.length - 1) {
+    for (let i = 0; i < left; i++) {
+      colors[i] = "bg-purple-300";
+    }
+  }
   if (state === "pre-compare") {
     colors[left] = "bg-green-300";
     colors[right] = "bg-green-300";

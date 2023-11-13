@@ -146,10 +146,15 @@ export function* insertionSortGenerator(initialArray) {
   const array = [...initialArray];
 
   for (let i = 1; i < array.length; i++) {
-    for (let j = i - 1; j > -1 && array[j + 1] < array[j]; j--) {
-      yield { array, i, j, state: "pre-swap" };
-      [array[j + 1], array[j]] = [array[j], array[j + 1]];
-      yield { array, i, j, state: "post-swap" };
+    for (let j = i - 1; j > -1; j--) {
+      yield { array, i, j, state: "pre-compare" };
+      if (array[j + 1] < array[j]) {
+        yield { array, i, j, state: "pre-swap" };
+        [array[j + 1], array[j]] = [array[j], array[j + 1]];
+        yield { array, i, j, state: "post-swap" };
+      } else {
+        break
+      }
     }
   }
 
@@ -196,37 +201,13 @@ export function* mergeSortGenerator(initialArray) {
           j,
           k,
         ),
+        start,
+        end,
         state: "pre-compare",
       };
 
       if (array[i] <= array[j]) {
-        yield {
-          ...outputIntermediateMergeSortArray(
-            array,
-            tempArray,
-            start,
-            mid,
-            end,
-            i,
-            j,
-            k,
-          ),
-          state: "pre-move-left",
-        };
         tempArray[k++] = array[i++];
-        yield {
-          ...outputIntermediateMergeSortArray(
-            array,
-            tempArray,
-            start,
-            mid,
-            end,
-            i,
-            j,
-            k,
-          ),
-          state: "post-move-left",
-        };
       } else {
         yield {
           ...outputIntermediateMergeSortArray(
@@ -239,6 +220,8 @@ export function* mergeSortGenerator(initialArray) {
             j,
             k,
           ),
+          start,
+          end,
           state: "pre-move-right",
         };
         tempArray[k++] = array[j++];
@@ -253,6 +236,8 @@ export function* mergeSortGenerator(initialArray) {
             j,
             k,
           ),
+          start,
+          end,
           state: "post-move-right",
         };
       }
