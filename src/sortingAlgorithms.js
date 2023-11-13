@@ -153,7 +153,7 @@ export function* insertionSortGenerator(initialArray) {
         [array[j + 1], array[j]] = [array[j], array[j + 1]];
         yield { array, i, j, state: "post-swap" };
       } else {
-        break
+        break;
       }
     }
   }

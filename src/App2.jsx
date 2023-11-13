@@ -55,13 +55,13 @@ export default function App2() {
       setTimeout(stepSort, Math.floor(2400 / list.length));
     } else {
       setIsSorting(false);
-      flashGreen()
+      flashGreen();
     }
   }
 
   function flashGreen() {
-    setColors(Array(list.length).fill("bg-green-300"))
-    setTimeout(() =>setColors(Array(list.length).fill("bg-purple-300")), 500)
+    setColors(Array(list.length).fill("bg-green-300"));
+    setTimeout(() => setColors(Array(list.length).fill("bg-purple-300")), 500);
   }
 
   function startSorting() {
@@ -176,8 +176,8 @@ function insertionSortColors({ array, i, j, state }) {
     colors[j] = "bg-red-300";
     colors[j + 1] = "bg-red-300";
   } else if (state === "pre-compare") {
-    colors[j] = "bg-green-300"
-    colors[j + 1] = "bg-green-300"
+    colors[j] = "bg-green-300";
+    colors[j + 1] = "bg-green-300";
   }
   return colors;
 }
