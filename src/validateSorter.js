@@ -26,4 +26,3 @@ function validateSorter(sorter) {
 
   console.log("All tests passed!");
 }
-

@@ -15,20 +15,20 @@ export function* quickSortGenerator(initialArray) {
     let partitionIndex = start;
 
     for (let i = start; i < end; i++) {
-      yield {array, end, partitionIndex, i, pivots, state: "pre-compare"};
+      yield { array, end, partitionIndex, i, pivots, state: "pre-compare" };
       if (array[i] <= pivot) {
-        yield {array, end, partitionIndex, i, pivots, state: "pre-swap 1"};
+        yield { array, end, partitionIndex, i, pivots, state: "pre-swap 1" };
         [array[i], array[partitionIndex]] = [array[partitionIndex], array[i]];
-        yield {array,end,partitionIndex, i,pivots,state: "post-swap 1",};
+        yield { array, end, partitionIndex, i, pivots, state: "post-swap 1" };
         partitionIndex++;
       }
     }
 
-    yield {array,end,partitionIndex,pivots,state: "pre-swap 2",};
+    yield { array, end, partitionIndex, pivots, state: "pre-swap 2" };
     // Place pivot in the correct position
     [array[partitionIndex], array[end]] = [array[end], array[partitionIndex]];
     pivots.add(partitionIndex);
-    yield {array,end,partitionIndex,pivots,state: "post-swap 2",};
+    yield { array, end, partitionIndex, pivots, state: "post-swap 2" };
 
     // Push subarrays into the stack
     // Subarrays must have at least 2 elements
@@ -98,7 +98,6 @@ export function* hoareQuickSortGenerator(initialArray) {
 
   return array;
 }
-
 
 export function* selectionSortGenerator(initialArray) {
   const array = [...initialArray];
@@ -186,16 +185,76 @@ export function* mergeSortGenerator(initialArray) {
     let k = start;
 
     while (i <= mid && j <= end) {
-      yield {...outputIntermediateMergeSortArray(array, tempArray, start, mid, end, i, j, k), state: "pre-compare"};
+      yield {
+        ...outputIntermediateMergeSortArray(
+          array,
+          tempArray,
+          start,
+          mid,
+          end,
+          i,
+          j,
+          k,
+        ),
+        state: "pre-compare",
+      };
 
       if (array[i] <= array[j]) {
-        yield {...outputIntermediateMergeSortArray(array, tempArray, start, mid, end, i, j, k), state: "pre-move-left"};
+        yield {
+          ...outputIntermediateMergeSortArray(
+            array,
+            tempArray,
+            start,
+            mid,
+            end,
+            i,
+            j,
+            k,
+          ),
+          state: "pre-move-left",
+        };
         tempArray[k++] = array[i++];
-        yield {...outputIntermediateMergeSortArray(array, tempArray, start, mid, end, i, j, k), state: "post-move-left"};
+        yield {
+          ...outputIntermediateMergeSortArray(
+            array,
+            tempArray,
+            start,
+            mid,
+            end,
+            i,
+            j,
+            k,
+          ),
+          state: "post-move-left",
+        };
       } else {
-        yield {...outputIntermediateMergeSortArray(array, tempArray, start, mid, end, i, j, k), state: "pre-move-right"};
+        yield {
+          ...outputIntermediateMergeSortArray(
+            array,
+            tempArray,
+            start,
+            mid,
+            end,
+            i,
+            j,
+            k,
+          ),
+          state: "pre-move-right",
+        };
         tempArray[k++] = array[j++];
-        yield {...outputIntermediateMergeSortArray(array, tempArray, start, mid, end, i, j, k), state: "post-move-right"};
+        yield {
+          ...outputIntermediateMergeSortArray(
+            array,
+            tempArray,
+            start,
+            mid,
+            end,
+            i,
+            j,
+            k,
+          ),
+          state: "post-move-right",
+        };
       }
     }
 
@@ -215,25 +274,34 @@ export function* mergeSortGenerator(initialArray) {
   return array;
 }
 
-function outputIntermediateMergeSortArray(array, tempArray, start, mid, end, i, j, k) {
-  const output = [...array]
+function outputIntermediateMergeSortArray(
+  array,
+  tempArray,
+  start,
+  mid,
+  end,
+  i,
+  j,
+  k,
+) {
+  const output = [...array];
 
   let a = start;
 
   for (let b = start; b < k; b++) {
-    output[a] = tempArray[b]
+    output[a] = tempArray[b];
     a++;
   }
-  const left = a
+  const left = a;
   for (let b = i; b <= mid; b++) {
     output[a] = array[b];
     a++;
   }
-  const right = a
+  const right = a;
   for (let b = j; b <= end; b++) {
-    output[a] = array[b]
+    output[a] = array[b];
     a++;
   }
 
-  return {array: output, left, right, k}
+  return { array: output, left, right, k };
 }
