@@ -59,15 +59,10 @@ export default function App2() {
     }
   }
 
-  useEffect(() => {
-    if (isSorting) {
-      stepSort();
-    }
-  }, [isSorting]);
-
   function startSorting() {
     sortGenerator.current = sorters[selectedSorter].generator(list);
     setIsSorting(true);
+    stepSort();
   }
 
   return (
