@@ -33,13 +33,13 @@ export function* quickSortGenerator(initialArray) {
     // Push subarrays into the stack
     // Subarrays must have at least 2 elements
     if (partitionIndex + 1 < end) {
-      stack.push({ start: partitionIndex + 1, end: end });
+      stack.push({ start: partitionIndex + 1, end });
     } else {
       pivots.add(end);
     }
 
     if (partitionIndex - 1 > start) {
-      stack.push({ start: start, end: partitionIndex - 1 });
+      stack.push({ start, end: partitionIndex - 1 });
     } else {
       pivots.add(start);
     }
@@ -89,10 +89,10 @@ export function* hoareQuickSortGenerator(initialArray) {
     }
 
     if (right + 1 < end) {
-      stack.push({ start: right + 1, end: end });
+      stack.push({ start: right + 1, end });
     }
     if (start < right) {
-      stack.push({ start: start, end: right });
+      stack.push({ start, end: right });
     }
   }
 
@@ -177,8 +177,8 @@ export function* mergeSortGenerator(initialArray) {
 
     if (start < end) {
       const mid = Math.floor((start + end) / 2);
-      stack.push({ start: start, end: mid });
-      stack.push({ start: mid + 1, end: end });
+      stack.push({ start, end: mid });
+      stack.push({ start: mid + 1, end });
       mergeOperations.push({ start, mid, end });
     }
   }

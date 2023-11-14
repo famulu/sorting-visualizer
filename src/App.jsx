@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import {
   bubbleSortGenerator,
   insertionSortGenerator,
@@ -103,7 +103,7 @@ export default function App() {
       </div>
       <div className="flex flex-grow justify-center gap-[1px]">
         {list.map((num, i) => {
-          let bg = colors[i];
+          const bg = colors[i];
 
           return (
             <div
