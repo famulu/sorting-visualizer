@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   bubbleSortGenerator,
   insertionSortGenerator,
@@ -40,35 +40,47 @@ const sorters = {
 
 export default function App() {
   const [list, setList] = useState(() => generateArray(DEFAULT_ARRAY_SIZE));
-  const [isSorting, setIsSorting] = useState(false);
   const [selectedSorter, setSelectedSorter] = useState("Bubble Sort");
   const sortGenerator = useRef(null);
   const [colors, setColors] = useState(() =>
     Array(list.length).fill("bg-slate-800"),
   );
+  const [state, setState] = useState("waiting");
 
-  function stepSort() {
-    const { value, done } = sortGenerator.current.next();
-    if (!done) {
-      setList(value.array);
-      setColors(sorters[selectedSorter].colorFunction(value));
-      setTimeout(stepSort, Math.floor(2400 / list.length));
-    } else {
-      setIsSorting(false);
-      flashGreen();
+  useEffect(() => {
+    console.log("Running effect")
+    let timeoutId;
+    if (state === "sorting") {
+      const { value, done } = sortGenerator.current.next();
+      console.log({ value, done });
+      if (!done) {
+        timeoutId = setTimeout(
+          () => {
+            setList(value.array);
+            setColors(sorters[selectedSorter].colorFunction(value));
+          },
+          Math.floor(2400 / list.length),
+        );
+      } else {
+        setColors(Array(list.length).fill("bg-green-300"));
+        setState("flashing");
+      }
+    } else if (state === "flashing") {
+      timeoutId = setTimeout(
+        () => {
+          setColors(Array(list.length).fill("bg-purple-300"))
+          setState("waiting")
+        },
+        500,
+      );
     }
-  }
 
-  function flashGreen() {
-    setColors(Array(list.length).fill("bg-green-300"));
-    setTimeout(() => setColors(Array(list.length).fill("bg-purple-300")), 500);
-  }
-
-  function startSorting() {
-    sortGenerator.current = sorters[selectedSorter].generator(list);
-    setIsSorting(true);
-    stepSort();
-  }
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [selectedSorter, list.length, state, colors]);
 
   return (
     <div className="flex h-screen min-w-[600px] flex-col bg-slate-300 p-4 pb-8">
@@ -78,7 +90,7 @@ export default function App() {
           min="2"
           max="200"
           value={list.length}
-          disabled={isSorting}
+          disabled={state === "sorting"}
           onChange={(e) => {
             const size = +e.target.value;
             const newList = generateArray(size);
@@ -93,13 +105,28 @@ export default function App() {
               value={sorterKey}
               checked={selectedSorter === sorterKey}
               onChange={(e) => setSelectedSorter(e.target.value)}
-              disabled={isSorting}
+              disabled={state === "sorting"}
             />
             {sorterKey}
           </label>
         ))}
 
-        <SortButton disabled={isSorting} onClick={startSorting} />
+        <SortButton
+          disabled={state === "sorting"}
+          onClick={() => {
+            sortGenerator.current = sorters[selectedSorter].generator(list);
+            setState("sorting");
+            const { value, done } = sortGenerator.current.next();
+            console.log({ value, done });
+            if (!done) {
+              setList(value.array);
+              setColors(sorters[selectedSorter].colorFunction(value));
+            } else {
+              setColors(Array(list.length).fill("bg-green-300"));
+              setState("flashing");
+            }
+          }}
+        />
       </div>
       <div className="flex flex-grow justify-center gap-[1px]">
         {list.map((num, i) => {
