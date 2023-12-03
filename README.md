@@ -26,7 +26,7 @@ Welcome to the Sorting Visualizer! This is an interactive tool designed to demon
 
 ### Prerequisites
 
-- **Node.js:** Ensure Node.js is installed on your system. Verify this by running `node -v` in your terminal. If not installed, download it from [Node.js official website](https://nodejs.org/).
+- **Node.js:** Ensure Node.js is installed on your system. Verify this by running `node -v` in your terminal. If not installed, download it from the [Node.js](https://nodejs.org/) official website.
 - **Package Manager:** This project uses [pnpm](https://pnpm.io/installation) for managing dependencies.
 
 ### Steps
